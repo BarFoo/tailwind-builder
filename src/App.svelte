@@ -1,148 +1,175 @@
 <script>
-	import { afterUpdate } from 'svelte';
-	import { flip } from 'svelte/animate';
-	import { dndzone } from 'svelte-dnd-action';
-	import { nodeStore, nodeStoreIdIncrement } from './stores/node-store';
-	import { settingsStore } from './stores/settings-store';
+  import { onMount } from 'svelte';
+  import { flip } from 'svelte/animate';
+  import { app } from './stores/app';
+  import { nodeInstances } from './stores/node-instances';
+  
+  import Node from './Node.svelte';
+  import Container from './Container.svelte';
+  import Grid from './Grid.svelte';
+  import SettingsPanel from './SettingsPanel.svelte';
 
-	import Legend from './Legend.svelte';
-	import Container from './Container.svelte';
-	import SettingsPanel from './SettingsPanel.svelte';
+  import ContainerIcon from './icons/ContainerIcon.svelte';
+  import GridIcon from './icons/GridIcon.svelte';
 
-	import ContainerIcon from './icons/container.svelte';
-	import GridIcon from './icons/grid.svelte';
+  const navItems = [
+    {
+      displayName: 'Container',
+      icon: ContainerIcon,
+      component: Container,
+      componentType: 'Container',
+      rootBuilderClasses: 'container-root',
+      childClasses: 'container-child'
+    },
+    {
+      displayName: 'Grid',
+      icon: GridIcon,
+      component: Grid,
+      componentType: 'Grid',
+      rootBuilderClasses: 'grid-root',
+      childClasses: 'grid-child'
+    }
+  ];
 
-	const flipDurationMs = 300;
+  let instances = {};
 
-	$nodeStore = [];
+  function createNode(navItem) {
+    let matchingTypes = 0;
 
-	let currentSettings = [];
-	let currentSettingTitle = 'Settings';
-	let selectedNodeId = -1;
+    const isRoot = $app.selectedNode === null;
+    const root = isRoot ? $app.nodes : $app.selectedNode.children;
 
-	const componentTypes = {
-		'container': Container
-	};
+    const node = {
+      id: $app.nodeIdIncrement++,
+      name: navItem.displayName,
+      component: navItem.component,
+      componentType: navItem.componentType,
+      innerHTML: '',
+      children: [],
+      settings: [],
+      builderClasses: isRoot ? navItem.rootBuilderClasses : navItem.childClasses,
+      instanceClasses: ''
+    };
 
-	const navItems = [
-		{
-			displayName: "Container",
-			icon: ContainerIcon,
-			componentType: "container" 
-		}
-	];
+    root[root.length] = node;
+  }
 
-	function showSettings(node) {
-		currentSettingTitle = node.name + ' Settings';
-		currentSettings = node.instance.getSettings();
-		console.log(currentSettings);
-	}
+  function handleSort(e) {
+    $app.nodes = e.detail.items;
+  }
 
-	function createNode(componentType, name) {
+  function handleNodeKey(dispatchEvent) {
+    console.log('Something goes here');
+    const e = dispatchEvent.detail.keyEvent;
+    const node = dispatchEvent.detail.node;
+    if (e.target.classList.contains("component")) {
+      if(e.keyCode === 46 || e.keyCode === 8) {
+        $app.selectedNode = null;
+        deleteNode($app.nodes, node.id);
+        $app.nodes = $app.nodes;
+      }
+      // TODO: Maybe support up, down, edit too
+    }
+  }
 
-		let matchingTypes = 0;
+  function handleNodeClick(evt) {
+    // TODO: Handle right click mouse event for context menu
+  } 
 
-		for (let i=0; i < $nodeStore.length; i++) {
-			if ( 'componentType' in $nodeStore[i] && $nodeStore[i].componentType === componentType) {
-				matchingTypes++;
-			}
-		}
+  function handleNodeFocus(evt) {
+    const node = evt.detail.node;
+    if(node !== undefined) {
+      $app.selectedNode = node;
+    }
+  }
 
-		const node = { 
-			id: $nodeStoreIdIncrement, 
-			component: componentTypes[componentType], 
-			name: name + " #" + (matchingTypes + 1),
-			componentType: componentType,
-			hasAutoDisplayedSettings: false
-		};
+  function handlePreviewClick(e) {
+    if (e.target.id === 'preview') {
+      $app.selectedNode = null;
+    }
+  }
 
-		$nodeStore[$nodeStore.length] = node;
-		selectedNodeId = node.id;
-		$nodeStoreIdIncrement++;
-	}
+  function deleteNode(start, nodeId) {
+    let found = false;
+    const len = start.length;
+    for(let i = 0; i < len; i++) {
+      if(start[i].id === nodeId) {
+        start.splice(i, 1);
+        found = true;
+        break;
+      }
 
-	function handleSort(e) {
-        $nodeStore = e.detail.items;
-	}
+      if(start[i].children.length > 0) {
+        found = deleteNode(start[i].children, nodeId);
+      }
 
-	function handleNodeKey(e, nodeId) {
-		if(e.target.classList.contains('component') && (e.keyCode === 46 || e.keyCode === 8)) {
-			deleteNode(nodeId);
-		}
-	}
+      if(found) {
+        break;
+      }
+    }
+    return found;
+  }
 
-	function handleNodeClick(evt, node) {
-		// todo: If evt is right mouse click show context menu..
-	}
+  function saveApp(val) {
+    const toSave = Object.assign({}, val);
+    toSave.selectedNode = null;
+    localStorage.setItem("app", JSON.stringify(toSave));
+  }
 
-	function handleNodeFocus(evt, node) {
-		if(!node.hasAutoDisplayedSettings) return;
-		selectedNodeId = node.id;
-		showSettings(node);
-	}
+  app.subscribe(val => {
+    // Do not save selected node, if a node is selected on page load
+    // lifecycle methods DO NOT run. I do not know why, but this is
+    // a temporary workaround..
+    saveApp(val);
+  });
 
-	function deleteNode(nodeId) {
-		$nodeStore = $nodeStore.filter(function(n, index, arr) {
-			if(n.id !== nodeId) return n;
-		});
-	}
-
-	afterUpdate(() => {
-		// We have to do this here since instance isn't available at the time of creating the node
-		const nodeStoreLength = $nodeStore.length;
-		if(nodeStoreLength > 0) {
-			const latestNode = $nodeStore[nodeStoreLength - 1];
-			if(latestNode.id === selectedNodeId && !latestNode.hasAutoDisplayedSettings) {
-				showSettings(latestNode);
-				latestNode.hasAutoDisplayedSettings = true;
-			}
-		}
-	});
+  onMount(() => {
+    setInterval(() => {
+      $app = $app;
+      saveApp($app);
+    }, 1000);
+  });
 
 </script>
 
 <main class="bg-gray-200 h-screen grid grid-cols-12">
-	<div class="flex flex-col overflow-hidden h-full col-span-9 xl:col-span-10 py-4 px-8">
-		<nav class="flex flex-row text-sm mb-4 gap-2">
-			{#each navItems as navItem}
-				<span class="cursor-pointer" on:click={() => createNode(navItem.componentType, navItem.displayName)}>
-					<span class="inline-block align-middle"><svelte:component this={navItem.icon} /></span>
-					{navItem.displayName}
-				</span>
-			{/each} 
-		</nav>
-		<div class="bg-white h-full max-h-full flex-1" use:dndzone={{items: $nodeStore, flipDurationMs: flipDurationMs, dropTargetStyle: {}}} 
-		on:consider={handleSort} on:finalize={handleSort}> 
-			{#each $nodeStore as node(node.id)}
-				<div  class="component h-32 border-dashed border border-gray-300 relative" title="Click on the name to rename it. Delete or backspace to remove this node."
-				class:is-selected={selectedNodeId === node.id}
-				on:click={(e) => handleNodeClick(e, node)}
-				on:focus={(e) => handleNodeFocus(e, node)}
-				on:blur={(e) => selectedNodeId = -1}
-				on:keyup={(e) => handleNodeKey(e, node.id)}
-				animate:flip={{duration: flipDurationMs}}>
-					<div class="legend absolute top-0 left-0 z-50 text-xs bg-gray-200 opacity-50 p-1 text-center" 
-					contenteditable="true" 
-					bind:innerHTML={node.name}
-					tabindex="-1">
-						{node.name}
-					</div>
-					<svelte:component this={node.component} bind:this={node.instance} />
-				</div>
-			{/each}
-		</div>
-	</div>
-	<div class="bg-gray-100 border border-l border-t-0 border-r-0 border-b-0 border-gray-400 h-full col-span-3 xl:col-span-2 p-4">
-		<SettingsPanel settings={currentSettings} title={currentSettingTitle} />
-	</div>
+  <div
+    class="flex flex-col overflow-hidden h-full col-span-9 xl:col-span-10 py-4 px-8">
+    <nav class="flex flex-row text-sm mb-4 gap-2">
+      {#each navItems as navItem}
+        <span
+          class="cursor-pointer"
+          on:click={() => createNode(navItem)}>
+          <span class="inline-block align-middle"><svelte:component
+              this={navItem.icon} /></span>
+          {navItem.displayName}
+        </span>
+      {/each}
+    </nav>
+    <div
+      id="preview"
+      class="bg-white h-full max-h-full flex-1 overflow-auto {$app.pageClasses}"
+      class:is-selected={$app.selectedNode === null} 
+      on:consider={handleSort}
+      on:finalize={handleSort}
+      on:click|self={handlePreviewClick}>
+      {#each $app.nodes as node (node.id)}
+        <Node {node} selectedNodeId={$app.selectedNode ? $app.selectedNode.id : -1}
+            on:nodeClick={handleNodeClick}
+            on:nodeFocus={handleNodeFocus}
+            on:nodeKey={handleNodeKey}>
+        </Node>
+      {/each}
+    </div>
+  </div>
+  <div
+    class="bg-gray-100 border border-l border-t-0 border-r-0 border-b-0 border-gray-400 h-full col-span-3 xl:col-span-2 p-4">
+    <SettingsPanel />
+  </div>
 </main>
-  
-<style>
-	.component > .legend {
-		display: none;
-	}
 
-	.component:hover > .legend, .component.is-selected > .legend {
-		display: block;
-	}
+<style>
+  .is-selected {
+    border: solid 2px black;
+  } 
 </style>
