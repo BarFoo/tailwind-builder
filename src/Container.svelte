@@ -1,25 +1,55 @@
 <script>
-    import { onMount } from 'svelte';
-    import { type, padding, margin } from './data/settings';
+  import { beforeUpdate } from 'svelte';
 
-    export let node;
+  export let node;
+  export let selectedNodeId;
 
-    onMount(() => {
-        if(node.settings.length === 0) {
-            [type, padding, margin].forEach(v => {
-                node.settings.push(Object.assign({}, v));
-            });
+  $: isSelected = selectedNodeId === node.id;
 
-            node.settings.forEach(s => {
-                s.identifier = node.id;
-                s.isDeletable = false;
-                if(s.id === 'padding') {
-                    s.value = 'p-4';
-                }
-            });
-        }
+  const getSetting = (id) => node.settings.find(s => s.id === id).value;
 
-    });
+  let type = getSetting('type');
+  $: cssClasses = node.instanceClasses;
+
+  beforeUpdate(() => {
+    type = getSetting('type');
+    isSelected = selectedNodeId === node.id;
+  });
 </script>
 
-<slot></slot>
+{#if type === 'div'}
+  <div class={cssClasses} bind:this={node.html} class:is-selected={isSelected}>
+    <slot></slot>
+  </div>
+{:else if type === 'main'}
+  <main class={cssClasses} bind:this={node.html} class:is-selected={isSelected}>
+    <slot></slot>
+  </main>
+{:else if type === 'header'}
+  <header class={cssClasses} bind:this={node.html} class:is-selected={isSelected}>
+    <slot></slot>
+  </header>
+{:else if type === 'footer'}
+  <footer class={cssClasses} bind:this={node.html} class:is-selected={isSelected}>
+    <slot></slot>
+  </footer>
+{:else if type === 'aside'}
+  <aside class={cssClasses} bind:this={node.html} class:is-selected={isSelected}>
+    <slot></slot>
+  </aside>
+{:else if type === 'article'}
+  <article class={cssClasses} bind:this={node.html} class:is-selected={isSelected}>
+    <slot></slot>
+  </article>
+{:else}
+  <slot></slot>
+{/if}
+
+<style>
+  div, main, header, footer, aside, article {
+    border: dashed 1px gray;
+    min-height: 6rem;
+    position: relative;
+    z-index: 25;
+  }
+</style>

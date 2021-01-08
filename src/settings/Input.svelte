@@ -1,5 +1,13 @@
 <script>
+  import { createEventDispatcher } from 'svelte';
+
+  const dispatch = createEventDispatcher();
+
   export let setting = {};
+
+  function handleChange() {
+    dispatch('settingUpdated', setting);
+  }
 </script>
 
-<input type={setting.inputType} />
+<input type="text" bind:value={setting.value} on:change={handleChange}  />

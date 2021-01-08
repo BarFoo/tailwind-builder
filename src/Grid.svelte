@@ -1,41 +1,30 @@
 <script>
-  import { onMount } from 'svelte';
-  import { notify } from './stores/notify';
-  import { padding, margin,  } from './data/settings';
+  import { beforeUpdate } from 'svelte';
 
   export let node;
+  export let selectedNodeId;
 
-  onMount(() => {
-      if(node.settings.length === 0) {
-          [padding, margin].forEach(v => {
-              node.settings.push(Object.assign({}, v));
-          });
+  $: isSelected = selectedNodeId === node.id;
 
-          node.settings.forEach(s => {
-              s.identifier = node.id;
-              s.isDeletable = false;
-              if(s.id === 'padding') {
-                  s.value = 'p-4';
-              }
-          });
-      }
-      
-      updateClasses();
-
-      const unsubscribe = notify.subscribe(n => {
-          if(n.type === 'settingChanged' && n.identifier === node.id) {
-              updateClasses();
-          }
-      }); 
-
-      return {
-          destroy() {
-              unsubscribe();
-          }
-      }
+  beforeUpdate(() => {
+    isSelected = selectedNodeId === node.id;
   });
-
-  function updateClasses() {
-      node.instanceClasses = node.settings.map(s => s.value).join(' ');
-  }
 </script>
+
+<div class="{node.instanceClasses}" class:is-selected={isSelected}>
+  <slot></slot>
+</div>
+
+<style>
+  div {
+    position: relative;
+  }
+  div:empty  {
+    border: dashed 1px gray;
+    min-height: 18rem;
+  }
+  div > div, main, header, footer, aside, article {
+    border: dashed 1px gray;
+    min-height: 18rem;
+  }
+</style>

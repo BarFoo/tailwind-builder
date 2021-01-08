@@ -1,175 +1,151 @@
 <script>
-  import { onMount } from 'svelte';
-  import { flip } from 'svelte/animate';
-  import { app } from './stores/app';
-  import { nodeInstances } from './stores/node-instances';
-  
+  import { nodes,  selectedNode, pageClasses } from './stores';
   import Node from './Node.svelte';
-  import Container from './Container.svelte';
-  import Grid from './Grid.svelte';
-  import SettingsPanel from './SettingsPanel.svelte';
+  import UtilitiesPanel from './UtilitiesPanel.svelte';
+  import nodeTypes from './data/node-types';
+  import { nodeManager } from './nodeManager';
+  import NodeTreeview from './NodeTreeview.svelte';
+  import icons from './icons';
+  import {dndzone} from 'svelte-dnd-action';
 
-  import ContainerIcon from './icons/ContainerIcon.svelte';
-  import GridIcon from './icons/GridIcon.svelte';
-
-  const navItems = [
-    {
-      displayName: 'Container',
-      icon: ContainerIcon,
-      component: Container,
-      componentType: 'Container',
-      rootBuilderClasses: 'container-root',
-      childClasses: 'container-child'
-    },
-    {
-      displayName: 'Grid',
-      icon: GridIcon,
-      component: Grid,
-      componentType: 'Grid',
-      rootBuilderClasses: 'grid-root',
-      childClasses: 'grid-child'
-    }
-  ];
-
-  let instances = {};
-
-  function createNode(navItem) {
-    let matchingTypes = 0;
-
-    const isRoot = $app.selectedNode === null;
-    const root = isRoot ? $app.nodes : $app.selectedNode.children;
-
-    const node = {
-      id: $app.nodeIdIncrement++,
-      name: navItem.displayName,
-      component: navItem.component,
-      componentType: navItem.componentType,
-      innerHTML: '',
-      children: [],
-      settings: [],
-      builderClasses: isRoot ? navItem.rootBuilderClasses : navItem.childClasses,
-      instanceClasses: ''
-    };
-
-    root[root.length] = node;
-  }
-
-  function handleSort(e) {
-    $app.nodes = e.detail.items;
-  }
-
-  function handleNodeKey(dispatchEvent) {
-    console.log('Something goes here');
+  function onNodeKeyUp(dispatchEvent) {
     const e = dispatchEvent.detail.keyEvent;
     const node = dispatchEvent.detail.node;
-    if (e.target.classList.contains("component")) {
-      if(e.keyCode === 46 || e.keyCode === 8) {
-        $app.selectedNode = null;
-        deleteNode($app.nodes, node.id);
-        $app.nodes = $app.nodes;
-      }
-      // TODO: Maybe support up, down, edit too
+    if(e.target === undefined || e.keyCode === 13) {
+      e.preventDefault();
+      return false;
+    }
+    if((e.target.classList.contains('component') || e.target.classList.contains('component-child')) && (e.keyCode === 46 || e.keyCode === 8)) {
+      $selectedNode = null;
+      nodeManager.deleteNode($nodes, node.id);
+      $nodes = $nodes;
     }
   }
 
-  function handleNodeClick(evt) {
-    // TODO: Handle right click mouse event for context menu
+  function onNodeClick(evt) {
+    const node = evt.detail.node;
+    const mouseEvent = evt.detail.mouseEvent;
+
+    if(mouseEvent.button === 0) {
+      $selectedNode = node;
+    }
   } 
 
-  function handleNodeFocus(evt) {
-    const node = evt.detail.node;
-    if(node !== undefined) {
-      $app.selectedNode = node;
-    }
-  }
-
-  function handlePreviewClick(e) {
+  function onPreviewClick(e) {
     if (e.target.id === 'preview') {
-      $app.selectedNode = null;
+      $selectedNode = null;
     }
   }
 
-  function deleteNode(start, nodeId) {
-    let found = false;
-    const len = start.length;
-    for(let i = 0; i < len; i++) {
-      if(start[i].id === nodeId) {
-        start.splice(i, 1);
-        found = true;
-        break;
-      }
+  function createNode(nodeType) {
+    
+    const isRoot = $selectedNode === null;
+    const node = nodeManager.createNode(nodeType);
 
-      if(start[i].children.length > 0) {
-        found = deleteNode(start[i].children, nodeId);
-      }
-
-      if(found) {
-        break;
-      }
+    if(isRoot) {
+      $nodes.push(node);
+    } else {
+      $selectedNode.children.push(node)
     }
-    return found;
+
+    $nodes = $nodes;
   }
 
-  function saveApp(val) {
-    const toSave = Object.assign({}, val);
-    toSave.selectedNode = null;
-    localStorage.setItem("app", JSON.stringify(toSave));
+  function onNodeRenamed() {
+    $nodes = $nodes;
   }
 
-  app.subscribe(val => {
-    // Do not save selected node, if a node is selected on page load
-    // lifecycle methods DO NOT run. I do not know why, but this is
-    // a temporary workaround..
-    saveApp(val);
-  });
+  function handleRootNodeSort(e) {
+    $nodes = e.detail.items;
+  }
 
-  onMount(() => {
-    setInterval(() => {
-      $app = $app;
-      saveApp($app);
-    }, 1000);
-  });
 
 </script>
 
-<main class="bg-gray-200 h-screen grid grid-cols-12">
-  <div
-    class="flex flex-col overflow-hidden h-full col-span-9 xl:col-span-10 py-4 px-8">
-    <nav class="flex flex-row text-sm mb-4 gap-2">
-      {#each navItems as navItem}
-        <span
-          class="cursor-pointer"
-          on:click={() => createNode(navItem)}>
+<main id="main" class="bg-gray-200 h-screen grid grid-cols-12">
+  <div class="flex flex-col overflow-hidden h-full col-span-9 lg:col-span-10 py-4 px-8" on:click|self={() => $selectedNode = null }>
+    <nav class="flex flex-row text-sm mb-4 gap-2" on:click|self={() => $selectedNode = null}>
+      {#each nodeTypes as nodeType}
+        <span class="cursor-pointer" on:click={() => createNode(nodeType)}>
           <span class="inline-block align-middle"><svelte:component
-              this={navItem.icon} /></span>
-          {navItem.displayName}
+              this={icons[nodeType.icon]} /></span>
+          {nodeType.displayName}
         </span>
       {/each}
     </nav>
     <div
       id="preview"
-      class="bg-white h-full max-h-full flex-1 overflow-auto {$app.pageClasses}"
-      class:is-selected={$app.selectedNode === null} 
-      on:consider={handleSort}
-      on:finalize={handleSort}
-      on:click|self={handlePreviewClick}>
-      {#each $app.nodes as node (node.id)}
-        <Node {node} selectedNodeId={$app.selectedNode ? $app.selectedNode.id : -1}
-            on:nodeClick={handleNodeClick}
-            on:nodeFocus={handleNodeFocus}
-            on:nodeKey={handleNodeKey}>
+      class="bg-white h-full max-h-full flex-1 overflow-auto {$pageClasses}"
+      on:click|self={onPreviewClick}
+      use:dndzone="{{items: $nodes}}"
+      on:consider={handleRootNodeSort}
+      on:finalize={handleRootNodeSort}
+      type="preview">
+      {#each $nodes as node (node.id)}
+        <Node {node}
+            on:nodeClick={onNodeClick}
+            on:nodeKeyUp={onNodeKeyUp}
+            on:nodeRenamed={onNodeRenamed}
+            cssClasses="component">
         </Node>
       {/each}
     </div>
   </div>
-  <div
-    class="bg-gray-100 border border-l border-t-0 border-r-0 border-b-0 border-gray-400 h-full col-span-3 xl:col-span-2 p-4">
-    <SettingsPanel />
+  <div class="bg-gray-100 border border-l border-t-0 border-r-0 border-b-0 border-gray-300 h-full col-span-3 lg:col-span-2 p-4">
+    <div class="h-3/6 overflow-auto">
+      <UtilitiesPanel />
+    </div>
+    <div class="h-3/6 overflow-auto">
+      <h2 class="border border-l-0 border-r-0 border-t-0 border-b border-gray-300 pb-2 mb-4 font-bold">Nodes</h2>
+      {#if $nodes.length}
+        {#each $nodes as node}
+          <NodeTreeview {node} on:nodeRenamed={onNodeRenamed} />
+        {/each}     
+      {:else}
+        <p>Nodes will appear here.</p>
+      {/if}
+    </div>    
   </div>
 </main>
 
 <style>
-  .is-selected {
-    border: solid 2px black;
-  } 
+  :global(.is-selected) {
+    border: solid 2px black !important;
+  }
+  h2 {
+    font-size: 1.2rem;
+  }
+  ::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  ::-webkit-scrollbar-button {
+    width: 0px;
+    height: 0px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #333;
+    border: 0px none #222;
+    border-radius: 50px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #333;
+  }
+  ::-webkit-scrollbar-thumb:active {
+    background: #222;
+  }
+  ::-webkit-scrollbar-track {
+    background: #E5E7EB;
+    border: 0px none #ffffff;
+    border-radius: 50px;
+  }
+  ::-webkit-scrollbar-track:hover {
+    background: #E5E7EB;
+  }
+  ::-webkit-scrollbar-track:active {
+    background: #fff;
+  }
+  ::-webkit-scrollbar-corner {
+    background: transparent;
+  }
 </style>

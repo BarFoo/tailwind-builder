@@ -1,66 +1,98 @@
 export default [
   {
     label: 'Block',
-    value: 'block'
+    value: 'block',
+    group: 'Display',
+    name: 'Display'
   },
   {
     label: 'Hidden',
-    value: 'hidden'
+    value: 'hidden',
+    group: 'Display',
+    name: 'Display'
   },
   {
     label: 'Inline Block',
-    value: 'inline-block'
+    value: 'inline-block',
+    group: 'Display',
+    name: 'Display'
   },
   {
     label: 'Inline',
-    value: 'inline'
+    value: 'inline',
+    group: 'Display',
+    name: 'Display'
   },
   {
     label: 'Flex',
-    value: 'flex'
+    value: 'flex',
+    group: 'Display',
+    name: 'Display'
   },
   {
     label: 'Inline Flex',
-    value: 'inline-flex'
+    value: 'inline-flex',
+    group: 'Display',
+    name: 'Display'
   },
   {
     label: 'Table',
-    value: 'table'
+    value: 'table',
+    group: 'Display',
+    name: 'Display'
   },
   {
     label: 'Table Caption',
-    value: 'table-caption'
+    value: 'table-caption',
+    group: 'Display',
+    name: 'Display'
   },
   {
     label: 'Table Cell',
-    value: 'table-cell'
+    value: 'table-cell',
+    group: 'Display',
+    name: 'Display'
   },
   {
     label: 'Table Column',
-    value: 'table-column'
+    value: 'table-column',
+    group: 'Display',
+    name: 'Display'
   },
   {
     label: 'Table Column Group',
-    value: 'table-column-group'
+    value: 'table-column-group',
+    group: 'Display',
+    name: 'Display'
   },
   {
     label: 'Table Footer Group',
-    value: 'table-footer-group'
+    value: 'table-footer-group',
+    group: 'Display',
+    name: 'Display'
   },
   {
     label: 'Table Header Group',
-    value: 'table-header-group'
+    value: 'table-header-group',
+    group: 'Display',
+    name: 'Display'
   },
   {
     label: 'Table Row Group',
-    value: 'table-row-group'
+    value: 'table-row-group',
+    group: 'Display',
+    name: 'Display'
   },
   {
     label: 'Table Row',
-    value: 'table-row'
+    value: 'table-row',
+    group: 'Display',
+    name: 'Display'
   },
   {
     label: 'Flow Root',
-    value: 'flow-root'
+    value: 'flow-root',
+    group: 'Display',
+    name: 'Display'
   }
 ];

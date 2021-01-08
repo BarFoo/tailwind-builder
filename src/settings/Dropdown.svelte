@@ -1,16 +1,18 @@
 <script>
+  import { createEventDispatcher } from 'svelte';
   import Select from 'svelte-select';
-  import { notify } from '../stores/notify';
 
+  const dispatch = createEventDispatcher();
+  
   export let setting = {};
+
+  $: items = setting.items;
+  $: selectedValue = setting.value;
 
   function handleSelect(evt) {
     setting.value = evt.detail.value;
-    notify.set({
-      type: 'settingChanged',
-      identifier: setting.identifier
-    });
+    dispatch('settingUpdated', setting);
   }
 </script>
 
-<Select items={setting.items} selectedValue={setting.value} showIndicator={true} isClearable={false} on:select={handleSelect} />
+<Select {items} {selectedValue} showIndicator={true} isClearable={false} on:select={handleSelect} />
