@@ -1,0 +1,3 @@
+const contextMenuKey = {};
+
+export { contextMenuKey };

@@ -2,11 +2,11 @@
   import { nodes,  selectedNode, pageClasses } from './stores';
   import Node from './Node.svelte';
   import UtilitiesPanel from './UtilitiesPanel.svelte';
-  import nodeTypes from './data/node-types';
   import { nodeManager } from './nodeManager';
   import NodeTreeview from './NodeTreeview.svelte';
-  import icons from './icons';
-  import {dndzone} from 'svelte-dnd-action';
+  import { activeMenuItem } from './stores';
+  import NodeMenu from './NodeMenu.svelte';
+  import ContextMenu from './contextMenu/ContextMenu.svelte';
 
   function onNodeKeyUp(dispatchEvent) {
     const e = dispatchEvent.detail.keyEvent;
@@ -19,14 +19,17 @@
       $selectedNode = null;
       nodeManager.deleteNode($nodes, node.id);
       $nodes = $nodes;
+    } else if (e.keyCode === 38 || e.keyCode === 40) {
+      checkSelectedNode(e);
     }
   }
 
   function onNodeClick(evt) {
     const node = evt.detail.node;
-    const mouseEvent = evt.detail.mouseEvent;
 
-    if(mouseEvent.button === 0) {
+    if($selectedNode !== null && $selectedNode.id === node.id) {
+      $selectedNode = null;
+    } else {
       $selectedNode = node;
     }
   } 
@@ -34,53 +37,44 @@
   function onPreviewClick(e) {
     if (e.target.id === 'preview') {
       $selectedNode = null;
+      $activeMenuItem = -1;
     }
-  }
-
-  function createNode(nodeType) {
-    
-    const isRoot = $selectedNode === null;
-    const node = nodeManager.createNode(nodeType);
-
-    if(isRoot) {
-      $nodes.push(node);
-    } else {
-      $selectedNode.children.push(node)
-    }
-
-    $nodes = $nodes;
   }
 
   function onNodeRenamed() {
     $nodes = $nodes;
   }
 
-  function handleRootNodeSort(e) {
-    $nodes = e.detail.items;
+  function checkSelectedNode(e) {
+    if($selectedNode !== null && (e.keyCode === 38 || e.keyCode === 40)) {
+      const hasParent = $selectedNode.parentId >= 0;
+      const start = hasParent ? nodeManager.findNode($nodes, $selectedNode.parentId).children : $nodes;
+      const matchingIndex = start.findIndex(c => c.id === $selectedNode.id); 
+      if(e.keyCode === 38) {
+        // up
+        if(start[matchingIndex - 1]) {
+          $selectedNode = start[matchingIndex - 1];
+        }
+      } else {
+        if(start[matchingIndex + 1]) {
+          $selectedNode = start[matchingIndex + 1];
+        }
+      }
+    }
   }
-
 
 </script>
 
 <main id="main" class="bg-gray-200 h-screen grid grid-cols-12">
   <div class="flex flex-col overflow-hidden h-full col-span-9 lg:col-span-10 py-4 px-8" on:click|self={() => $selectedNode = null }>
-    <nav class="flex flex-row text-sm mb-4 gap-2" on:click|self={() => $selectedNode = null}>
-      {#each nodeTypes as nodeType}
-        <span class="cursor-pointer" on:click={() => createNode(nodeType)}>
-          <span class="inline-block align-middle"><svelte:component
-              this={icons[nodeType.icon]} /></span>
-          {nodeType.displayName}
-        </span>
-      {/each}
+    <nav class="flex flex-row text-sm mb-4" on:click|self={() => $selectedNode = null}>
+      <NodeMenu />
     </nav>
     <div
       id="preview"
       class="bg-white h-full max-h-full flex-1 overflow-auto {$pageClasses}"
       on:click|self={onPreviewClick}
-      use:dndzone="{{items: $nodes}}"
-      on:consider={handleRootNodeSort}
-      on:finalize={handleRootNodeSort}
-      type="preview">
+      on:keyup={checkSelectedNode}>
       {#each $nodes as node (node.id)}
         <Node {node}
             on:nodeClick={onNodeClick}
@@ -95,12 +89,12 @@
     <div class="h-3/6 overflow-auto">
       <UtilitiesPanel />
     </div>
-    <div class="h-3/6 overflow-auto">
+    <div class="h-3/6 overflow-auto" on:keyup={checkSelectedNode}>
       <h2 class="border border-l-0 border-r-0 border-t-0 border-b border-gray-300 pb-2 mb-4 font-bold">Nodes</h2>
       {#if $nodes.length}
         {#each $nodes as node}
           <NodeTreeview {node} on:nodeRenamed={onNodeRenamed} />
-        {/each}     
+        {/each}   
       {:else}
         <p>Nodes will appear here.</p>
       {/if}
@@ -108,7 +102,13 @@
   </div>
 </main>
 
-<style>
+<ContextMenu />
+
+<style global lang="postcss">
+  @tailwind base;
+  @tailwind components;
+  @tailwind utilities;
+
   :global(.is-selected) {
     border: solid 2px black !important;
   }
@@ -148,4 +148,5 @@
   ::-webkit-scrollbar-corner {
     background: transparent;
   }
+
 </style>

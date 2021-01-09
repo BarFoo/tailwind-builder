@@ -11,23 +11,17 @@
 
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
-    <meta name="apple-mobile-web-app-title" content="Svelte PWA">
+    <meta name="apple-mobile-web-app-title" content="Tailwind Builder">
     <link rel="apple-touch-icon" href="/images/icons/icon-152x152.png">
 
     <link rel="icon" type="image/png" href="/favicon.png">
-    <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/build/bundle.css">
-
-    <script defer src="/build/bundle.js"></script>
+    <link rel="stylesheet" type="text/css" href="/root.css"/>
   </head>
 
   <body>
 
-    <noscript>
-      <div>
-        Javascript is required. Please enable it and try again.
-      </div>
-    </noscript>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <script type="module" src="/_dist_/index.js"></script>
 
     <script src="/scripts/install.js"></script>
     <script>

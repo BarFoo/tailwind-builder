@@ -2,8 +2,8 @@
 	const _expansionState = {}
 </script>
 <script>
-  import { selectedNode } from './stores';
-  import icons from './icons';
+  import { nodes, selectedNode } from './stores';
+  import icons from './allIcons';
   import { nodeManager } from './nodeManager';
   import { createEventDispatcher} from 'svelte';
 
@@ -14,9 +14,15 @@
 
   let expanded = _expansionState[node.id] || true;
 	const toggleExpansion = () => {
-		expanded = _expansionState[node.id] = !expanded;
-	}
+    expanded = _expansionState[node.id] = !expanded;
+  };
+  const toggleActive = () => {
+    isActive ? $selectedNode = null : $selectedNode = node;
+  };
+  
+
   $: arrowDown = expanded;
+  $: isActive = $selectedNode !== null && $selectedNode.id === node.id;
 
   let nameInstance;
 
@@ -43,13 +49,13 @@
   }
 </script>
 
-<ul class="treeview text-sm" title="Double click to rename, right click for menu. This has better sorting.">
+<ul class="treeview text-sm" title="Double click to toggle state, right click for menu.">
   <li class="treeview__item">
     {#if children.length > 0}
       <span class="arrow align-middle" class:arrowDown on:click={toggleExpansion}><svelte:component this={icons['RightArrow']} /></span>
-      <span bind:this={nameInstance} on:dblclick={doRename} 
+      <span bind:this={nameInstance}
         on:blur={() => nameInstance.contenteditable = false}
-        contenteditable=false>{node.name}</span>
+        contenteditable=false class:isActive on:click={toggleActive}>{node.name}</span>
       {#if expanded}
         {#each children as child}
           <svelte:self node={child} />
@@ -57,9 +63,9 @@
       {/if}
     {:else}
       <span class="inline-block align-middle"><svelte:component this={icons['Radix']}></svelte:component></span>
-      <span class="inline-block" bind:this={nameInstance} on:dblclick={doRename} 
+      <span class="inline-block" bind:this={nameInstance} 
         on:blur={() => nameInstance.contentEditable = false} on:keyup={handleRenameKeyUp} on:keydown={handleRenameKeyDown}
-        contenteditable=false bind:textContent={node.name}>{node.name}</span>
+        contenteditable=false on:click={toggleActive} class:isActive>{node.name}</span>
     {/if}
   </li>
 </ul>
@@ -70,7 +76,13 @@
     margin: 0 0 2px 0;
     padding: 0;
   }
-  .treeview__item > ul {
+  .treeview:nth-child(+1) {
+    padding-left: 1rem;
+  }
+  .treeview__item {
+    cursor: pointer;
+  }
+  .treeview__item ul {
     padding-left: 1rem;
   }
   .arrowDown { transform: rotate(90deg); }
@@ -78,4 +90,7 @@
 		display: inline-block;
     cursor: pointer;
 	}
+  .isActive {
+    font-weight: bold;
+  }
 </style>

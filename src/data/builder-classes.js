@@ -1,1 +1,0 @@
-export default 'border-dashed border border-gray-400';

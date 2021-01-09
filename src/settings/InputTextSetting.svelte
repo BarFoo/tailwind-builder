@@ -10,4 +10,4 @@
   }
 </script>
 
-<input type="text" bind:value={setting.value} on:change={handleChange}  />
+<input type="text" bind:value={setting.value} placeholder={setting.placeholder} on:change={handleChange}  />

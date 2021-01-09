@@ -1,14 +1,10 @@
 <script>
   import { beforeUpdate } from 'svelte';
+  import { selectedNode } from './stores';
 
   export let node;
-  export let selectedNodeId;
 
-  $: isSelected = selectedNodeId === node.id;
-
-  beforeUpdate(() => {
-    isSelected = selectedNodeId === node.id;
-  });
+  $: isSelected = $selectedNode !== null ? $selectedNode.id === node.id : false;
 </script>
 
 <div class="{node.instanceClasses}" class:is-selected={isSelected}>
@@ -17,14 +13,8 @@
 
 <style>
   div {
+    border: dashed 1px gray;
     position: relative;
-  }
-  div:empty  {
-    border: dashed 1px gray;
-    min-height: 18rem;
-  }
-  div > div, main, header, footer, aside, article {
-    border: dashed 1px gray;
-    min-height: 18rem;
+    min-height: 12rem;
   }
 </style>

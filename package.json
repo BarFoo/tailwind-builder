@@ -1,24 +1,29 @@
 {
-  "name": "svelte-pwa-template",
+  "name": "tailwind-builder",
   "version": "1.0.0",
   "scripts": {
-    "build": "rollup -c",
-    "dev": "rollup -c -w",
-    "start": "sirv public"
+    "build": "snowpack build",
+    "start": "snowpack dev"
   },
   "devDependencies": {
-    "@rollup/plugin-commonjs": "11.0.2",
-    "@rollup/plugin-node-resolve": "^7.0.0",
-    "rollup": "^1.20.0",
-    "rollup-plugin-livereload": "^1.0.0",
-    "rollup-plugin-svelte": "^5.0.3",
-    "rollup-plugin-terser": "^7.0.1",
-    "svelte": "^3.0.0",
+    "@snowpack/app-scripts-svelte": "^1.9.1",
+    "@snowpack/plugin-dotenv": "^2.0.4",
+    "@snowpack/plugin-svelte": "^3.3.0",
+    "@snowpack/plugin-webpack": "^2.0.17",
+    "autoprefixer": "^10.2.1",
+    "postcss": "^8.2.3",
+    "postcss-config": "^1.1.1",
+    "postcss-load-config": "^3.0.0",
+    "snowpack": "^2.15.1",
+    "svelte-check": "^1.1.2",
     "svelte-code-editor": "^1.0.1",
-    "svelte-dnd-action": "^0.7.1"
+    "svelte-dnd-action": "^0.7.1",
+    "svelte-preprocess": "^4.6.1",
+    "svelte-select": "^3.16.1"
   },
   "dependencies": {
-    "sirv-cli": "^0.4.4",
-    "svelte-select": "^3.16.1"
+    "svelte": "^3.31.2",
+    "svelte-transitions": "^1.2.0",
+    "tailwindcss": "^2.0.2"
   }
 }

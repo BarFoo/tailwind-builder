@@ -1,80 +1,69 @@
 <script>
-    import { beforeUpdate, onMount, onDestroy } from 'svelte'; 
-    import { pageUtilities, pageClasses, selectedNode } from './stores';
-    import { groupByKey } from './functions';
-    import loadOptions from './data/get-utilities';
+    import { pageUtilities, pageClasses, selectedNode, nodes } from './stores';
 
-    import Select from 'svelte-select';
     import TrashIcon from './icons/TrashIcon.svelte';
+    import DropdownSetting from './settings/DropdownSetting.svelte';
+    import InputTextSetting from './settings/InputTextSetting.svelte';
 
-    import Dropdown from './settings/Dropdown.svelte';
-
-    $: utilitiesKey = 1;
-    $: title = ($selectedNode ? $selectedNode.name : 'Page') + ' Utilities';
-    $: utilities = $selectedNode ? $selectedNode.utilities : $pageUtilities;
-
-    let utilitiesGrouped = {};
-
-    $: {
-        utilitiesGrouped = groupByKey(utilities, 'group');
-        console.log(utilitiesGrouped);
-    }
- 
-    const groupBy = (item) => item.group;
+    let utilityClass = '';
+    $: title = ($selectedNode !== null ? $selectedNode.name : 'Page') + ' Utilities';
+    $: hasSelectedNode = $selectedNode !== null;
 
     const settingTypes = {
-        'Dropdown': Dropdown
+        'Dropdown': DropdownSetting,
+        'InputText': InputTextSetting
     };
 
-    function addUtility(evt) {
-        if(evt.detail.value !== undefined) {
-
-            const existingUtility = utilities.find(u => u.name === evt.detail.name);
-
-            if(existingUtility) {
-                existingUtility.value = evt.detail.value;
+    function addUtility() {
+        if(utilityClass.trim().length > 0) {
+            if(hasSelectedNode) {
+                $selectedNode.utilities.push(utilityClass);
             } else {
-                const newUtility = Object.assign({}, evt.detail);
-                utilities.push(newUtility);
+                $pageUtilities.push(utilityClass);
             }
-
             updateClasses();
-            utilitiesKey++;
+            utilityClass = '';
         }
     }
 
     function deleteUtility(index) {
-        utilities.splice(index, 1);
-        updateClasses();
-    }
-
-    function deleteUtilitiesByGroup(groupName) {
-        utilities = utilities.filter(u => u.group !== groupName);
-    }
-
-    function updateClasses() {
-        if($selectedNode) {
-            $selectedNode.instanceClasses = $selectedNode.utilities.map(u => u.value).join(' ');
+        if(hasSelectedNode) {
+            $selectedNode.utilities.splice(index, 1);
         } else {
-            $pageClasses = $pageUtilities.map(s => s.value).join(' ');
+            $pageUtilities.splice(index, 1);
         }
+        updateClasses();
     }
 
     function handleSettingUpdated() {
-        
+        if(hasSelectedNode) {
+            $selectedNode = {...$selectedNode};
+        }
+        $nodes = [...$nodes];
     }
 
-    beforeUpdate(() => {
-        updateClasses();
-    });
+    function handleUtilityKeyUp(e) {
+        if(e.keyCode === 13) {
+            e.preventDefault();
+            addUtility();
+            return false;
+        }
+    }
 
-    onMount(() => {
-        updateClasses();
-    });
+    function updateClasses() {
+        if(hasSelectedNode) {
+            $selectedNode.instanceClasses = $selectedNode.utilities.join(' ');
+        } else {
+            $pageClasses = $pageUtilities.join(' ');
+            $pageUtilities = [...$pageUtilities];
+        }
+        $selectedNode = $selectedNode;
+        $nodes = [...$nodes];
+    }
 
 </script>
 
-{#if $selectedNode && $selectedNode.settings.length}
+{#if $selectedNode != null && $selectedNode.settings.length}
     <h2 class="border border-l-0 border-r-0 border-t-0 border-b border-gray-300 pb-2 mb-4">{$selectedNode.name} Settings</h2>
     {#each $selectedNode.settings as setting}
         <div class="mb-4 text-sm">
@@ -86,30 +75,10 @@
 
 <h2 class="border border-l-0 border-r-0 border-t-0 border-b border-gray-300 pb-2 mb-4">{title}</h2>
 <div class="mb-4">
-    {#each [utilitiesKey] as k (k)}
-        <Select {loadOptions} 
-        placeholder="Add utility..." 
-        showIndicator={false} 
-        isClearable={true} 
-        noOptionsMessage="Search"
-        on:select={addUtility} {groupBy} />
-    {/each}
+    <input class="p-2 w-full border border-gray-300" type="text" bind:value={utilityClass} on:keyup={handleUtilityKeyUp} placeholder="Add a utility..." />
 </div>
-{#each Object.entries(utilitiesGrouped) as [key, children]}
-    <div class="mb-2 text-sm">
-        <label class="block mb-1 font-bold">
-            {key} 
-            <span class="float-right cursor-pointer" on:click={() => deleteUtilitiesByGroup(key)}>
-                <TrashIcon />
-            </span>
-        </label>
-        {#each children as utility}
-            <p>
-                <span class="float-right cursor-pointer" on:click={() => deleteUtility(utility.index)}><TrashIcon /></span>
-                {utility.value}
-            </p>
-        {/each}
-    </div>
+{#each (hasSelectedNode ? $selectedNode.utilities : $pageUtilities) as utility, i}
+    <p class="mb-1 text-sm">{utility} <span class="float-right cursor-pointer" on:click={() => deleteUtility(i)}><TrashIcon /></span></p>
 {/each}
 
 <style>

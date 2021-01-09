@@ -1,10 +1,10 @@
 <script>
   import { beforeUpdate } from 'svelte';
+  import { selectedNode } from './stores';
 
   export let node;
-  export let selectedNodeId;
 
-  $: isSelected = selectedNodeId === node.id;
+  $: isSelected = $selectedNode ? $selectedNode.id === node.id : false;
 
   const getSetting = (id) => node.settings.find(s => s.id === id).value;
 
@@ -13,7 +13,6 @@
 
   beforeUpdate(() => {
     type = getSetting('type');
-    isSelected = selectedNodeId === node.id;
   });
 </script>
 
@@ -21,6 +20,10 @@
   <div class={cssClasses} bind:this={node.html} class:is-selected={isSelected}>
     <slot></slot>
   </div>
+{:else if type === 'section'}
+  <section class={cssClasses} bind:this={node.html} class:is-selected={isSelected}>
+    <slot></slot>
+  </section>
 {:else if type === 'main'}
   <main class={cssClasses} bind:this={node.html} class:is-selected={isSelected}>
     <slot></slot>
@@ -48,7 +51,7 @@
 <style>
   div, main, header, footer, aside, article {
     border: dashed 1px gray;
-    min-height: 6rem;
+    min-height: 12rem;
     position: relative;
     z-index: 25;
   }

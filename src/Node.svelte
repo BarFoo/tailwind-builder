@@ -4,7 +4,6 @@
 
   export let node;
   export let cssClasses;
-  export let selectedNodeId;
 
   const dispatch = createEventDispatcher();
 
@@ -39,11 +38,12 @@
   }
 
   function handleLegendKeyUp(e) {
-    node.name = $selectedNode.name = e.target.innerText;
+    node.name = e.target.innerText;
+    if($selectedNode !== null) {
+      $selectedNode.name = node.name;
+    }
     dispatch('nodeRenamed');
   }
-
-  $: selectedNodeId = $selectedNode ? $selectedNode.id : -1;
 
 </script>
 
@@ -54,16 +54,14 @@
     tabindex={node.id}>
     <svelte:component
     this={node.component}
-    {node}
-    {selectedNodeId}>
-      <div class="legend absolute top-0 left-0 z-50 text-xs bg-gray-200 opacity-50 p-1 text-center" tabindex="-1">
-       <div contenteditable on:keydown|self|stopPropagation={handleLegendKeyDown} 
-       on:keyup|stopPropagation={handleLegendKeyUp}>{node.name}</div> 
-      </div>
+    {node}>
+    <div class="legend absolute top-0 left-0 z-50 text-xs bg-gray-200 opacity-50 p-1" tabindex="-1">
+      <div contenteditable on:keydown|self|stopPropagation={handleLegendKeyDown} 
+      on:keyup|stopPropagation={handleLegendKeyUp}>{node.name}</div> 
+     </div>
       {#each node.children as child (child.id)}
         <svelte:self 
         bind:node={child} 
-        {selectedNodeId}
         on:nodeKeyUp={handleChildNodeKeyUp}
         on:nodeClick={handleChildNodeClick}
         cssClasses="component-child" />
@@ -73,7 +71,10 @@
 
 <style>
   .legend {
-    pointer-events: all;
+    display: none;
+  }
+  div:hover .legend {
+    display: block;
   }
   div {
     outline: none;
