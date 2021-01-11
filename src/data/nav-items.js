@@ -1,38 +1,6 @@
 import ComponentMenuItem from '../menu/ComponentMenuItem.svelte';
 import ComponentMenuHeaderItem from '../menu/ComponentMenuHeaderItem.svelte';
 
-const containerTypes = [
-  [
-    {
-      label: 'div',
-      value: 'div'
-    },
-    {
-      label: 'main',
-      value: 'main'
-    },
-    {
-      label: 'section',
-      value: 'section'
-    },
-    {
-      label: 'header',
-      value: 'header'
-    },
-    {
-      label: 'article',
-      value: 'article'
-    },
-    {
-      label: 'aside',
-      value: 'aside'
-    },
-    {
-      label: 'footer',
-      value: 'footer'
-    }
-  ]
-];
 
 const headingTypes = [
   [

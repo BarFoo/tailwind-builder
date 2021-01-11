@@ -17,7 +17,6 @@
     "snowpack": "^2.15.1",
     "svelte-check": "^1.1.2",
     "svelte-code-editor": "^1.0.1",
-    "svelte-dnd-action": "^0.7.1",
     "svelte-preprocess": "^4.6.1",
     "svelte-select": "^3.16.1"
   },

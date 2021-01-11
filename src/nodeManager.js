@@ -1,9 +1,9 @@
 import { get } from 'svelte/store';
 import { nodeIdIncrement } from './stores';
 import { deepClone } from './functions';
-import Grid from './Grid.svelte';
-import Container from './Container.svelte';
-import HeadingComponent from './HeadingComponent.svelte';
+import Grid from './elements/Grid.svelte';
+import Container from './elements/Container.svelte';
+import HeadingComponent from './elements/HeadingComponent.svelte';
 
 const componentTypes = {
   'Container': Container,

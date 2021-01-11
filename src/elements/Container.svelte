@@ -1,46 +1,38 @@
 <script>
-  import { beforeUpdate } from 'svelte';
-  import { selectedNode } from './stores';
+  import { selectedNode } from '../stores';
 
   export let node;
 
   $: isSelected = $selectedNode ? $selectedNode.id === node.id : false;
-
-  const getSetting = (id) => node.settings.find(s => s.id === id).value;
-
-  let type = getSetting('type');
   $: cssClasses = node.instanceClasses;
-
-  beforeUpdate(() => {
-    type = getSetting('type');
-  });
+  $: element = node.settings['containerElement'];
 </script>
 
-{#if type === 'div'}
+{#if element === 'div'}
   <div class={cssClasses} bind:this={node.html} class:is-selected={isSelected}>
     <slot></slot>
   </div>
-{:else if type === 'section'}
+{:else if element === 'section'}
   <section class={cssClasses} bind:this={node.html} class:is-selected={isSelected}>
     <slot></slot>
   </section>
-{:else if type === 'main'}
+{:else if element === 'main'}
   <main class={cssClasses} bind:this={node.html} class:is-selected={isSelected}>
     <slot></slot>
   </main>
-{:else if type === 'header'}
+{:else if element === 'header'}
   <header class={cssClasses} bind:this={node.html} class:is-selected={isSelected}>
     <slot></slot>
   </header>
-{:else if type === 'footer'}
+{:else if element === 'footer'}
   <footer class={cssClasses} bind:this={node.html} class:is-selected={isSelected}>
     <slot></slot>
   </footer>
-{:else if type === 'aside'}
+{:else if element === 'aside'}
   <aside class={cssClasses} bind:this={node.html} class:is-selected={isSelected}>
     <slot></slot>
   </aside>
-{:else if type === 'article'}
+{:else if element === 'article'}
   <article class={cssClasses} bind:this={node.html} class:is-selected={isSelected}>
     <slot></slot>
   </article>

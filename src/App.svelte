@@ -6,7 +6,6 @@
   import NodeTreeview from './NodeTreeview.svelte';
   import { activeMenuItem } from './stores';
   import NodeMenu from './NodeMenu.svelte';
-  import ContextMenu from './contextMenu/ContextMenu.svelte';
 
   function onNodeKeyUp(dispatchEvent) {
     const e = dispatchEvent.detail.keyEvent;
@@ -101,8 +100,6 @@
     </div>    
   </div>
 </main>
-
-<ContextMenu />
 
 <style global lang="postcss">
   @tailwind base;

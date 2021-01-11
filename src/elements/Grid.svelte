@@ -1,6 +1,5 @@
 <script>
-  import { beforeUpdate } from 'svelte';
-  import { selectedNode } from './stores';
+  import { selectedNode } from '../stores';
 
   export let node;
 

@@ -47,13 +47,17 @@
     node.name = newName;
     dispatch('nodeRenamed');
   }
+
+  function handleNodeKeyUp() {
+
+  }
 </script>
 
 <ul class="treeview text-sm" title="Double click to toggle state, right click for menu.">
-  <li class="treeview__item">
+  <li class="treeview__item" on:keyup={handleNodeKeyUp}>
     {#if children.length > 0}
       <span class="arrow align-middle" class:arrowDown on:click={toggleExpansion}><svelte:component this={icons['RightArrow']} /></span>
-      <span bind:this={nameInstance}
+      <span bind:this={nameInstance} on:keyup={handleRenameKeyUp} on:keydown={handleRenameKeyDown}
         on:blur={() => nameInstance.contenteditable = false}
         contenteditable=false class:isActive on:click={toggleActive}>{node.name}</span>
       {#if expanded}
@@ -76,14 +80,11 @@
     margin: 0 0 2px 0;
     padding: 0;
   }
-  .treeview:nth-child(+1) {
-    padding-left: 1rem;
+  :global(.treeview__item > .treeview){
+    padding-left: 1.2rem;
   }
   .treeview__item {
     cursor: pointer;
-  }
-  .treeview__item ul {
-    padding-left: 1rem;
   }
   .arrowDown { transform: rotate(90deg); }
   .arrow {
