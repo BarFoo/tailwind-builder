@@ -1,3 +1,0 @@
-const contextMenuKey = {};
-
-export { contextMenuKey };
