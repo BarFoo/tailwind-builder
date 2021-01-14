@@ -12,6 +12,7 @@
   let tabIndex = -1;
 
   $: children = node.children;
+  $: isActive = $selectedNode !== null && $selectedNode.id === node.id;
 
   let expanded = _expansionState[node.id] || true;
 	const toggleExpansion = () => {
@@ -22,7 +23,6 @@
   };
   
   $: arrowDown = expanded;
-  $: isActive = $selectedNode !== null && $selectedNode.id === node.id
 
   const keyup = (e) => {
     if($selectedNode) {
@@ -36,10 +36,10 @@
 </script>
 
 <ul class="treeview text-sm outline-none" tabindex={tabIndex--} on:keyup={keyup}>
-  <li class="treeview__item">
+  <li class="treeview__item" on:click|stopPropagation={toggleActive}>
     {#if children && children.length > 0}
-      <span class="arrow align-middle" class:arrowDown on:click={toggleExpansion}><RightArrowIcon /></span>
-      <span on:click={toggleActive} class:isActive bind:this={nameRef} bind:textContent={node.name} contenteditable=false>{node.name}</span>
+      <span class="arrow align-middle" class:arrowDown on:click|stopPropagation={toggleExpansion}><RightArrowIcon /></span>
+      <span class:isActive bind:this={nameRef} bind:textContent={node.name} contenteditable=false>{node.name}</span>
       {#if expanded}
         {#each children as child}
           <svelte:self node={child} />
@@ -47,7 +47,7 @@
       {/if}
     {:else}
       <span class="inline-block align-middle"><RadixIcon /></span>
-      <span on:click={toggleActive} class:isActive>{node.name}</span>
+      <span class:isActive>{node.name}</span>
     {/if}
   </li>
 </ul>

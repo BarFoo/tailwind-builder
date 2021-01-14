@@ -8,20 +8,23 @@
   "devDependencies": {
     "@snowpack/app-scripts-svelte": "^1.9.1",
     "@snowpack/plugin-dotenv": "^2.0.4",
-    "@snowpack/plugin-svelte": "^3.3.0",
+    "@snowpack/plugin-svelte": "^3.5.0",
     "@snowpack/plugin-webpack": "^2.0.17",
     "autoprefixer": "^9.8.6",
     "lodash-es": "^4.17.20",
     "postcss": "^8.2.3",
     "postcss-config": "^1.1.1",
     "postcss-load-config": "^3.0.0",
-    "snowpack": "^2.15.1",
+    "snowpack": "^3.0.10",
     "svelte": "^3.31.2",
     "svelte-check": "^1.1.2",
-    "svelte-code-editor": "^1.0.1",
     "svelte-preprocess": "^4.6.1",
     "svelte-select": "^3.16.1",
     "tailwindcss": "^2.0.2"
   },
-  "dependencies": {}
+  "dependencies": {
+    "codejar": "^3.2.3",
+    "js-beautify": "^1.13.4",
+    "prismjs": "^1.23.0"
+  }
 }

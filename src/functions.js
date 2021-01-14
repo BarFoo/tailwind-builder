@@ -33,6 +33,9 @@ export const findExistingUtility = (utilities, str) => {
  * @param string breakpoint
  */
 export const parseBreakpointUtilities = (utilities, breakpoint) => {
+  if (breakpoint === undefined || breakpoint === null) {
+    return utilities;
+  }
   const newUtilities = [];
   if (utilities && utilities.length) {
     utilities.forEach((u) => {
@@ -60,7 +63,7 @@ export const parseBreakpointUtilities = (utilities, breakpoint) => {
 
 export const breakpointMatches = (utility, breakpoint) => {
   return (
-    (utility.startsWith("sm") && breakpoint === "mobile") ||
+    (utility.startsWith(breakpoint) && breakpoint === "mobile") ||
     (utility.startsWith("md") && breakpoint === "tablet") ||
     ((utility.startsWith("lg") ||
       utility.startsWith("xl") ||

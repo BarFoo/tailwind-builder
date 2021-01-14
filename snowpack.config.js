@@ -5,22 +5,9 @@ module.exports = {
     src: "/_dist_",
   },
   plugins: ["@snowpack/plugin-svelte", "@snowpack/plugin-dotenv"],
-  install: [
-    /* ... */
-  ],
-  installOptions: {
-    /* ... */
-  },
-  devOptions: {
-    /* ... */
-  },
-  buildOptions: {
-    /* ... */
-  },
-  proxy: {
-    /* ... */
-  },
-  alias: {
-    /* ... */
+  optimize: {
+    bundle: true,
+    minify: true,
+    target: "es2018",
   },
 };

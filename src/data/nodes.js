@@ -36,5 +36,5 @@ export const gridNode = {
   canHaveChildren: true,
   component: GridComponent,
   name: "Grid",
-  utilities: ["grid", "grid-cols-1", "lg:grid-cols-3", "md:grid-cols-2", "p-4"],
+  utilities: ["grid", "grid-cols-1", "lg:grid-cols-3", "md:grid-cols-2"],
 };

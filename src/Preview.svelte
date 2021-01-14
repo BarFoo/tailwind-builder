@@ -1,9 +1,19 @@
 <script>
-  import { selectedNode, nodes, pageUtilities, previewBreakpoint } from "./stores";
+  import { selectedNode, nodes, pageUtilities, previewBreakpoint, previewInstance } from "./stores";
   import Node from "./Node.svelte";
+
   $: pageClasses = $pageUtilities.join(" ");
 
-  const nodeClick = (evt) => $selectedNode = evt.detail.node;
+  const nodeClick = (evt) => {
+    const node = evt.detail.node;
+    if(node) {
+      if($selectedNode !== null && $selectedNode.id === node.id) {
+        $selectedNode = null;
+      } else {
+        $selectedNode = node;
+      }
+    }
+  }
 
   const keyup = (e) => {
     if($selectedNode) {
@@ -14,12 +24,12 @@
     }
   }
 
-  $: breakpointClass = `preview-${$previewBreakpoint} mx-auto`;
+  $: breakpointClass = $previewBreakpoint ? `preview-${$previewBreakpoint} mx-auto` : "";
 
 </script>
 
 <div class="bg-white h-full max-h-full flex-1 overflow-auto outline-none {pageClasses} {breakpointClass}"
-    on:click|self={() => $selectedNode = null} on:keyup={keyup} tabindex="-1">
+    on:click|self={() => $selectedNode = null} on:keyup={keyup} tabindex="-1" bind:this={$previewInstance}>
     {#each $nodes as node (node.id)}
       <Node {node} on:nodeClick={nodeClick} />
     {/each}

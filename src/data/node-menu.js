@@ -11,13 +11,13 @@ export default [
     node: divNode,
   },
   {
-    text: "Container",
-    icon: ContainerIcon,
-    node: containerNode,
-  },
-  {
     text: "Grid",
     icon: GridIcon,
     node: gridNode,
+  },
+  {
+    text: "Container",
+    icon: ContainerIcon,
+    node: containerNode,
   },
 ];

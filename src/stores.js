@@ -3,9 +3,11 @@ import { getNodeId } from "./nodeId";
 import { cloneDeep } from "lodash-es";
 
 export const selectedNode = writable(null);
-export const pageUtilities = writable(["p-4"]);
+export const pageUtilities = writable([]);
 export const activeMenuItem = writable(-1);
 export const previewBreakpoint = writable("desktop");
+export const previewInstance = writable(null);
+export const previousBreakpoint = writable(null);
 
 function createNodes() {
   const { subscribe, update } = writable([]);
@@ -43,7 +45,6 @@ function createNodes() {
       return matching;
     },
     remove(id) {
-      console.log("Deleting " + id);
       const r = (start) => {
         for (let i = 0; i < start.length; i++) {
           if (start[i].id === id) {
