@@ -1,9 +1,9 @@
 <script>
-  import { selectedNode } from '../stores';
+  import { selectedNode } from "../stores";
 
   let ref;
 
-  $: text = node.settings['text'];
+  $: text = node.settings["text"];
 
   export function getHTML() {
     return ref.innerHTML;
@@ -12,7 +12,7 @@
 
 </script>
 
-<p bind:this={ref}>{text || 'Click here to change this text.'}</p>
+<p bind:this={ref}>{text || "Click here to change this text."}</p>
 
 <style>
   p {

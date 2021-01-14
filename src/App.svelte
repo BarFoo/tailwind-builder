@@ -1,98 +1,27 @@
 <script>
-  import { nodes,  selectedNode, pageClasses } from './stores';
-  import Node from './Node.svelte';
-  import UtilitiesPanel from './UtilitiesPanel.svelte';
-  import { nodeManager } from './nodeManager';
-  import NodeTreeview from './NodeTreeview.svelte';
-  import { activeMenuItem } from './stores';
-  import NodeMenu from './NodeMenu.svelte';
-
-  function onNodeKeyUp(dispatchEvent) {
-    const e = dispatchEvent.detail.keyEvent;
-    const node = dispatchEvent.detail.node;
-    if(e.target === undefined || e.keyCode === 13) {
-      e.preventDefault();
-      return false;
-    }
-    if((e.target.classList.contains('component') || e.target.classList.contains('component-child')) && (e.keyCode === 46 || e.keyCode === 8)) {
-      $selectedNode = null;
-      nodeManager.deleteNode($nodes, node.id);
-      $nodes = $nodes;
-    } else if (e.keyCode === 38 || e.keyCode === 40) {
-      checkSelectedNode(e);
-    }
-  }
-
-  function onNodeClick(evt) {
-    const node = evt.detail.node;
-
-    if($selectedNode !== null && $selectedNode.id === node.id) {
-      $selectedNode = null;
-    } else {
-      $selectedNode = node;
-    }
-  } 
-
-  function onPreviewClick(e) {
-    if (e.target.id === 'preview') {
-      $selectedNode = null;
-      $activeMenuItem = -1;
-    }
-  }
-
-  function onNodeRenamed() {
-    $nodes = $nodes;
-  }
-
-  function checkSelectedNode(e) {
-    if($selectedNode !== null && (e.keyCode === 38 || e.keyCode === 40)) {
-      const hasParent = $selectedNode.parentId >= 0;
-      const start = hasParent ? nodeManager.findNode($nodes, $selectedNode.parentId).children : $nodes;
-      const matchingIndex = start.findIndex(c => c.id === $selectedNode.id); 
-      if(e.keyCode === 38) {
-        // up
-        if(start[matchingIndex - 1]) {
-          $selectedNode = start[matchingIndex - 1];
-        }
-      } else {
-        if(start[matchingIndex + 1]) {
-          $selectedNode = start[matchingIndex + 1];
-        }
-      }
-    }
-  }
-
+  import { selectedNode, nodes } from "./stores";
+  import Preview from "./Preview.svelte";
+  import UtilitiesPanel from "./UtilitiesPanel.svelte";
+  import NodeTreeview from "./NodeTreeview.svelte";
+  import NodeMenu from "./NodeMenu.svelte";
 </script>
 
-<main id="main" class="bg-gray-200 h-screen grid grid-cols-12">
-  <div class="flex flex-col overflow-hidden h-full col-span-9 lg:col-span-10 py-4 px-8" on:click|self={() => $selectedNode = null }>
-    <nav class="flex flex-row text-sm mb-4" on:click|self={() => $selectedNode = null}>
+<main id="main" class="h-screen grid grid-cols-12">
+  <div class="bg-gray-200 overflow-hidden h-full col-span-9 lg:col-span-10">
+    <nav class="border-gray-300 border-b border-l-0 border-r-0 border-t-0  flex flex-row text-sm p-4" on:click|self={() => $selectedNode = null}>
       <NodeMenu />
     </nav>
-    <div
-      id="preview"
-      class="bg-white h-full max-h-full flex-1 overflow-auto {$pageClasses}"
-      on:click|self={onPreviewClick}
-      on:keyup={checkSelectedNode}>
-      {#each $nodes as node (node.id)}
-        <Node {node}
-            on:nodeClick={onNodeClick}
-            on:nodeKeyUp={onNodeKeyUp}
-            on:nodeRenamed={onNodeRenamed}
-            cssClasses="component">
-        </Node>
-      {/each}
-    </div>
+    <Preview />
   </div>
-  <div class="bg-gray-100 border border-l border-t-0 border-r-0 border-b-0 border-gray-300 h-full col-span-3 lg:col-span-2 p-4">
+  <div class="bg-gray-100 border-gray-300 border-b-0 border-l border-r-0 border-t-0 h-full col-span-3 lg:col-span-2 p-4">
     <div class="h-3/6 overflow-auto">
       <UtilitiesPanel />
     </div>
-    <div class="h-3/6 overflow-auto" on:keyup={checkSelectedNode}>
+    <div class="h-3/6 overflow-auto">
       <h2 class="border border-l-0 border-r-0 border-t-0 border-b border-gray-300 pb-2 mb-4 font-bold">Nodes</h2>
       {#if $nodes.length}
         {#each $nodes as node}
-          <NodeTreeview {node} on:nodeRenamed={onNodeRenamed} />
+          <NodeTreeview {node} />
         {/each}   
       {:else}
         <p>Nodes will appear here.</p>
@@ -107,7 +36,7 @@
   @tailwind utilities;
 
   :global(.is-selected) {
-    border: solid 2px black !important;
+    border: dashed 2px black !important;
   }
   h2 {
     font-size: 1.2rem;
@@ -121,23 +50,23 @@
     height: 0px;
   }
   ::-webkit-scrollbar-thumb {
-    background: #333;
-    border: 0px none #222;
+    background: #bdbdbd;
+    border: 0px none #adadad;
     border-radius: 50px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #333;
+    background: #cdcdcd;
   }
   ::-webkit-scrollbar-thumb:active {
     background: #222;
   }
   ::-webkit-scrollbar-track {
-    background: #E5E7EB;
+    background: #e1e1e1;
     border: 0px none #ffffff;
     border-radius: 50px;
   }
   ::-webkit-scrollbar-track:hover {
-    background: #E5E7EB;
+    background: #e1e1e1;
   }
   ::-webkit-scrollbar-track:active {
     background: #fff;
