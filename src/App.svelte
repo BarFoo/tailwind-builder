@@ -7,17 +7,17 @@
 </script>
 
 <main id="main" class="h-screen grid grid-cols-12">
-  <div class="bg-gray-200 overflow-hidden h-full col-span-9 lg:col-span-10">
+  <div class="bg-gray-200 overflow-hidden h-screen max-h-screen overflow-auto col-span-9 lg:col-span-10">
     <nav class="border-gray-300 border-b border-l-0 border-r-0 border-t-0  flex flex-row text-sm p-4" on:click|self={() => $selectedNode = null}>
       <NodeMenu />
     </nav>
     <Preview />
   </div>
   <div class="bg-gray-100 border-gray-300 border-b-0 border-l border-r-0 border-t-0 h-full col-span-3 lg:col-span-2 p-4">
-    <div class="h-3/6 overflow-auto">
+    <div class="h-3/5 overflow-auto">
       <UtilitiesPanel />
     </div>
-    <div class="h-3/6 overflow-auto">
+    <div class="h-2/5 overflow-auto">
       <h2 class="border border-l-0 border-r-0 border-t-0 border-b border-gray-300 pb-2 mb-4 font-bold">Nodes</h2>
       {#if $nodes.length}
         {#each $nodes as node}
@@ -42,8 +42,8 @@
     font-size: 1.2rem;
   }
   ::-webkit-scrollbar {
-    width: 4px;
-    height: 4px;
+    width: 8px;
+    height: 8px;
   }
   ::-webkit-scrollbar-button {
     width: 0px;

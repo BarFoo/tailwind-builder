@@ -1,9 +1,15 @@
 import ContainerIcon from "../icons/Container.svelte";
 import GridIcon from "../icons/Grid.svelte";
+import DivIcon from "../icons/Div.svelte";
 
-import { containerNode, gridNode } from "./nodes";
+import { divNode, containerNode, gridNode } from "./nodes";
 
 export default [
+  {
+    text: "Div",
+    icon: DivIcon,
+    node: divNode,
+  },
   {
     text: "Container",
     icon: ContainerIcon,

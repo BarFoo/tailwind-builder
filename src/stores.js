@@ -2,10 +2,10 @@ import { writable } from "svelte/store";
 import { getNodeId } from "./nodeId";
 import { cloneDeep } from "lodash-es";
 
-// These are the binded instances
 export const selectedNode = writable(null);
 export const pageUtilities = writable(["p-4"]);
 export const activeMenuItem = writable(-1);
+export const previewBreakpoint = writable("desktop");
 
 function createNodes() {
   const { subscribe, update } = writable([]);
@@ -51,7 +51,7 @@ function createNodes() {
             break;
           }
 
-          if (start[i].children.length > 0) {
+          if (start[i].children && start[i].children.length) {
             r(start[i].children);
           }
         }
