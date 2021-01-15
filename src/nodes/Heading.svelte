@@ -18,8 +18,8 @@
   <h3 class={cssClasses} class:is-selected={isSelected} on:click>{text}</h3>
 {:else if type === "h4"}
   <h4 class={cssClasses} class:is-selected={isSelected} on:click>{text}</h4>
-{:else if type === "footer"}
+{:else if type === "h5"}
   <h5 class={cssClasses} class:is-selected={isSelected} on:click>{text}</h5>
-{:else if type === "aside"}
+{:else if type === "h6"}
   <h6 class={cssClasses} class:is-selected={isSelected} on:click>{text}</h6>
 {/if}
