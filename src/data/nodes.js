@@ -65,4 +65,5 @@ export default {
   divNode,
   containerNode,
   gridNode,
+  headingNode,
 };
