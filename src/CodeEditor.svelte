@@ -57,5 +57,7 @@
 	pre[class*="language-"] {
 		border-radius: 0;
 		margin: 0;
+		min-height: 24rem;
+		max-height: calc(100vh - 350px);
 	}
 </style>

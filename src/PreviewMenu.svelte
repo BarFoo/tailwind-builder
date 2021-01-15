@@ -11,9 +11,6 @@
   const previewClick = (breakpoint) => $previewBreakpoint = breakpoint;
 
   const showCodeModal = () => {
-    // Force to desktop breakpoint to get all correct utilities
-    // Perhaps store the previous breakpoint and when modal is closed
-    // go back to it?
     $previousBreakpoint = $previewBreakpoint;
     $previewBreakpoint = null;
     open(CodePopup);
@@ -46,6 +43,7 @@
     height: 1.5rem;
     cursor: pointer;
   }
+  /* Use of global to prevent builder stripping out unused styles.. maybe just allow unused styles? */
   :global(.code-icon > svg) {
     fill: #666;
   }

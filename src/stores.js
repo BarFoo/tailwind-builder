@@ -1,5 +1,5 @@
 import { writable } from "svelte/store";
-import { getNodeId } from "./nodeId";
+import { getNodeId } from "./node-id";
 import { cloneDeep } from "lodash-es";
 
 export const selectedNode = writable(null);
@@ -10,10 +10,11 @@ export const previewInstance = writable(null);
 export const previousBreakpoint = writable(null);
 
 function createNodes() {
-  const { subscribe, update } = writable([]);
+  const { subscribe, set, update } = writable([]);
 
   return {
     subscribe,
+    set,
     add(node, parentId) {
       const newNode = cloneDeep(node);
       newNode.id = getNodeId();
@@ -66,6 +67,9 @@ function createNodes() {
       update((state) => {
         return [...state];
       });
+    },
+    reset() {
+      set([]);
     },
   };
 }

@@ -9,7 +9,7 @@
 </script>
 
 <!-- Do not worry about the weird Modal syntax.. it must be wrapped for the Modal context -->
-<Modal closeOnOuterClick={false} onClose={() => $previewBreakpoint = $previousBreakpoint}>
+<Modal closeOnOuterClick={false}>
   <main id="main" class="h-screen grid grid-cols-12">
     <div class="bg-gray-200 overflow-hidden h-screen max-h-screen overflow-auto col-span-9 lg:col-span-10">
       <nav class="border-gray-300 border-b border-l-0 border-r-0 border-t-0  flex flex-row text-sm p-4" on:click|self={() => $selectedNode = null}>

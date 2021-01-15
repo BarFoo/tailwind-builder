@@ -14,7 +14,7 @@
   $: children = node.children;
   $: isActive = $selectedNode !== null && $selectedNode.id === node.id;
 
-  let expanded = _expansionState[node.id] || true;
+  let expanded = _expansionState[node.id] || isActive;
 	const toggleExpansion = () => {
     expanded = _expansionState[node.id] = !expanded;
   };
