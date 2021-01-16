@@ -160,10 +160,16 @@
 {/if}
 
 <style>
-  div:is(:empty) {
-    min-height: 12rem;
+  div:empty, p:empty {
+    border: 1px dashed gray;
+  }
+  div:empty, p:empty {
+    min-height: 6rem;
   }
   .isSelected {
     border: 2px dashed;
+  }
+  .isSelected:empty {
+    border: 2px dashed black;
   }
 </style>
