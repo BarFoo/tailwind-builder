@@ -47,7 +47,10 @@ export const htmlToNodes = (html, nodes, parentId) => {
       node.parentId = parentId;
 
       if (childEl.classList && childEl.classList.length > 0) {
-        node.utilities = childEl.classList.toString().split(" ");
+        node.utilities = childEl.classList
+          .toString()
+          .split(" ")
+          .filter((cl) => cl.trim() !== "");
       }
 
       // todo: Tidy this up.. its messy
