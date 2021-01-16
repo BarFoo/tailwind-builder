@@ -6,10 +6,10 @@
   import { htmlToNodes } from "./node-parser";
 
   import Button from "./common/Button.svelte";
-  import SaveIcon from "./icons/Save.svelte";
 
   let code;
   let updatedCode;
+  let hasCodeChanged;
 
   const SVELTE_COMMENTS = /\<\!\-\-\<.*?\>\-\-\>/gm;
   const BUILDER_CLASSES = ["has-min-height","is-selected"];
@@ -22,7 +22,7 @@
     if(el.children && el.children.length > 0) {
       for(let c = 0; c < el.children.length; c++) {
         const child = el.children[c];
-        if(child.classList) {
+        if(child.classList && child.classList.length > 0) {
           const toRemove = [];
           for(let i = 0; i < child.classList.length; i++) {
             const cls = child.classList[i];
@@ -33,6 +33,8 @@
           toRemove.forEach((clsToRemove) => {
             child.classList.remove(clsToRemove);
           });
+        } else {
+          child.removeAttribute("class");
         }
                   
         clean(child);
@@ -42,15 +44,19 @@
 
   const codeChanged = (evt) => {
     updatedCode = evt.detail;
+    hasCodeChanged = true;
   }
 
   const updateNodes = () => {
     if(updatedCode === undefined || updatedCode.length === 0) {
+      if(hasCodeChanged) {
+        $nodes = [];
+      }
       close();
       return;
     }
+    
     const newNodes = htmlToNodes(updatedCode);
-    console.log(newNodes);
     $nodes = [...newNodes];
     close();
   }
@@ -75,7 +81,7 @@
 
 <div class="bg-gray-200 p-3 flex gap-4 items-end">
   <div class="flex-grow">
-    <Button icon={SaveIcon} type="success" text="save changes" on:click={updateNodes} />
+    <Button icon="save" type="success" text="save changes" on:click={updateNodes} />
   </div>
   
   <Button text="Cancel" on:click={() => close()} />

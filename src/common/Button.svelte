@@ -1,7 +1,10 @@
 <script>
+
+  import Icon from "./Icon.svelte";
+
   export let text;
   export let icon = undefined;
-  export let type;
+  export let type = undefined;
   export let rounded = false;
 
   let buttonClasses;
@@ -28,7 +31,7 @@
 <div class="flex overflow-hidden" class:rounded={rounded}>
   {#if icon}
     <div class="button-icon shadow-border p-3 cursor-pointer {iconClasses}" on:click>
-      <svelte:component this={icon} />
+      <Icon name={icon} class="fill-current" />
     </div>
   {/if}
   <button class="block text-sm shadow-border {buttonClasses} py-3 px-4 tracking-wide uppercase font-bold" class:p-8={icon === undefined} on:click>

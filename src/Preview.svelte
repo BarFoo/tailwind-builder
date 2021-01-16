@@ -15,21 +15,12 @@
     }
   }
 
-  const keyup = (e) => {
-    if($selectedNode) {
-      if(e.code === 'Delete') {
-        nodes.remove($selectedNode.id);
-        $selectedNode = null;
-      }
-    }
-  }
-
   $: breakpointClass = $previewBreakpoint ? `preview-${$previewBreakpoint} mx-auto` : "";
 
 </script>
 
 <div class="bg-white h-full max-h-full flex-1 overflow-auto outline-none {pageClasses} {breakpointClass}"
-    on:click|self={() => $selectedNode = null} on:keyup={keyup} tabindex="-1" bind:this={$previewInstance}>
+    on:click|self={() => $selectedNode = null} tabindex="-1" bind:this={$previewInstance}>
     {#each $nodes as node (node.id)}
       <Node {node} on:nodeClick={nodeClick} />
     {/each}

@@ -1,30 +1,47 @@
 <script>
   import items from "./data/node-menu";
-  import { nodes, activeMenuItem, selectedNode } from "./stores";
+  import { nodes, selectedNode } from "./stores";
+  import Icon from "./common/Icon.svelte";
 
-  import DropdownIcon from "./icons/Dropdown.svelte";
+  let activeMenuItem = null;
+  let ref;
 
-  const addNode = (node) => nodes.add(node, $selectedNode ? $selectedNode.id : null);
+  const addNode = (node, index) => {
+    if(node) {
+      nodes.add(node, $selectedNode ? $selectedNode.id : null);
+    } 
 
+    activeMenuItem = activeMenuItem === index ? null : index;
+  }
+
+  const checkHideMenus = (e) => {
+    if(!ref.contains(e.target)) {
+      activeMenuItem = null;
+    }
+  }
 </script>
 
-<ul class="flex flex-grow flex-row gap-3">
-  {#each items as item, i}
-    <li class="relative outline-none text-gray-500 hover:text-black"
+<svelte:window on:click={checkHideMenus} />
+
+<ul bind:this={ref} class="flex flex-grow flex-row gap-3">
+  {#each items as item, index}
+    <li class="relative flex flex-row items-center gap-1 outline-none text-gray-500 hover:text-black"
       title={item.description} 
-      on:click={() => addNode(item.node)}>
-      <span class="cursor-pointer inline-block align-middle"><svelte:component
-          this={item.icon} /></span>
+      on:click={() => addNode(item.node, index)}>
+      <Icon name={item.icon} class="fill-current cursor-pointer" />
       <span class="cursor-pointer">{item.text}</span>
       {#if item.children}
-        <span class="cursor-pointer inline-block align-middle" class:is-active={$activeMenuItem === i}><DropdownIcon /></span>
-        {#if $activeMenuItem === i}
-          <div class="absolute left-0 w-full mt-2 origin-top-left rounded-md shadow-lg md:w-48 z-50">
-            <div class="px-2 py-2 bg-white rounded-md shadow dark-mode:bg-gray-800">
+        <span class="cursor-pointer inline-block align-middle" class:is-active={activeMenuItem === index}><Icon name="dropdown" /></span>
+        {#if activeMenuItem === index}
+          <div class="absolute top-6 left-0 mt-2 origin-bottom-left shadow-lg whitespace-nowrap z-50">
+            <ul class="bg-white shadow dark-mode:bg-gray-800">
               {#each item.children as child}
-                <svelte:component this={child.component} item={child.item} />
+                <li class="inline-block flex gap-1 px-3 py-2 hover:bg-gray-100 cursor-pointer" on:click={() => addNode(child.node, index)}>
+                  <Icon name={child.icon} class="fill-current align-middle" />
+                  <span>{child.text}</span>
+                </li>
               {/each}
-            </div>
+            </ul>
           </div>
         {/if}
       {/if}

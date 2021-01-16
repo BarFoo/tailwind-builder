@@ -3,11 +3,11 @@ import { getNodeId } from "./node-id";
 import { cloneDeep } from "lodash-es";
 
 export const selectedNode = writable(null);
-export const pageUtilities = writable([]);
-export const activeMenuItem = writable(-1);
+export const pageUtilities = writable(["p-4"]);
 export const previewBreakpoint = writable("desktop");
 export const previewInstance = writable(null);
 export const previousBreakpoint = writable(null);
+export const isDragEnabled = writable(false);
 
 function createNodes() {
   const { subscribe, set, update } = writable([]);
@@ -20,12 +20,10 @@ function createNodes() {
       newNode.id = getNodeId();
       newNode.parentId = parentId;
       update((state) => {
-        if (newNode.parentId) {
+        if (newNode.parentId && newNode.parentId >= 0) {
           const parent = this.find(newNode.parentId, state);
-          if (parent.canHaveChildren) {
-            parent.children = parent.children || [];
-            parent.children = [...parent.children, newNode];
-          }
+          parent.children = parent.children || [];
+          parent.children = [...parent.children, newNode];
           return [...state];
         }
         return [...state, newNode];
@@ -40,7 +38,7 @@ function createNodes() {
         }
 
         if (start[i].children && start[i].children.length) {
-          matching = find(id, start[i].children);
+          matching = this.find(id, start[i].children);
         }
       }
       return matching;
@@ -70,6 +68,18 @@ function createNodes() {
     },
     reset() {
       set([]);
+    },
+    swap(fromId, toId) {
+      update((state) => {
+        let from = this.find(fromId, state);
+        let to = this.find(toId, state);
+        let tmpFrom = cloneDeep(from);
+
+        from = to;
+        to = tmpFrom;
+
+        return [...state];
+      });
     },
   };
 }

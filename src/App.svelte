@@ -1,12 +1,36 @@
 <script>
-  import { selectedNode, nodes, previousBreakpoint, previewBreakpoint } from "./stores";
+  import { selectedNode, nodes, isDragEnabled } from "./stores";
   import Preview from "./Preview.svelte";
   import UtilitiesPanel from "./UtilitiesPanel.svelte";
-  import NodeTreeview from "./NodeTreeview.svelte";
   import NodeMenu from "./NodeMenu.svelte";
   import Modal from "./Modal.svelte";
   import PreviewMenu from "./PreviewMenu.svelte";
+  import Treeview from "./treeview/Treeview.svelte";
+
+  /** Enable drag and drop for nodes anywhere (treeview, builder etc.) via the user of ctrl key */
+  const windowKeydown = (e) => {
+    if(e.key === "Control") {
+      $isDragEnabled = true;
+    }
+  }
+
+  /**
+   * Handle deleting selected node anywhere, as long as the current target isn't an input.
+  */
+  const windowKeyup = (e) => {
+    if($selectedNode && e.target && e.target.nodeName.toLowerCase() !== "input") {
+      if(e.code === "Delete") {
+        nodes.remove($selectedNode.id);
+        $selectedNode = null;
+      }
+    }
+    if(e.key === "Control") {
+      $isDragEnabled = false;
+    }
+  }
 </script>
+
+<svelte:window on:keydown={windowKeydown} on:keyup={windowKeyup} />
 
 <!-- Do not worry about the weird Modal syntax.. it must be wrapped for the Modal context -->
 <Modal closeOnOuterClick={false}>
@@ -18,16 +42,14 @@
       </nav>
       <Preview />
     </div>
-    <div class="bg-gray-100 border-gray-300 border-b-0 border-l border-r-0 border-t-0 h-full col-span-3 lg:col-span-2 p-4">
+    <div class="bg-gray-100 resize-x overflow-hidden border-gray-300 border-b-0 border-l border-r-0 border-t-0 h-full col-span-3 lg:col-span-2 p-4">
       <div class="h-3/5 overflow-auto">
         <UtilitiesPanel />
       </div>
       <div class="h-2/5 overflow-auto">
         <h2 class="border border-l-0 border-r-0 border-t-0 border-b border-gray-300 pb-2 mb-4 font-bold">Nodes</h2>
         {#if $nodes.length}
-          {#each $nodes as node}
-            <NodeTreeview {node} />
-          {/each}   
+          <Treeview items={$nodes} />
         {:else}
           <p>Nodes will appear here.</p>
         {/if}
@@ -41,9 +63,6 @@
   @tailwind components;
   @tailwind utilities;
 
-  :global(.is-selected) {
-    border: dashed 2px black !important;
-  }
   h2 {
     font-size: 1.2rem;
   }
@@ -80,5 +99,4 @@
   ::-webkit-scrollbar-corner {
     background: transparent;
   }
-
 </style>

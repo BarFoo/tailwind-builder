@@ -3,9 +3,7 @@ export const getUtilityPrefix = (str) => {
     return str;
   }
   const parts = str.split("-");
-  parts.splice(parts.length - 1, 1);
-
-  return parts.join("-");
+  return parts[0];
 };
 
 /**
@@ -19,7 +17,11 @@ export const findExistingUtility = (utilities, str) => {
   let matchingIndex = -1;
   const search = getUtilityPrefix(str);
   utilities.some((u, index) => {
-    if (search === getUtilityPrefix(u)) {
+    if (
+      search === getUtilityPrefix(u) &&
+      u.indexOf("-") > 0 &&
+      str.indexOf("-") > 0
+    ) {
       matchingIndex = index;
       return true;
     }
@@ -29,6 +31,8 @@ export const findExistingUtility = (utilities, str) => {
 /**
  * This function takes an array of utilities and returns a new array with the utilities
  * parsed for a given breakpoint.
+ * TODO: Explore supporting upwards cascade of breakpoints, so if md: is the highest for a given
+ * utility class.. this should be supported on higher breakpoints as well.
  * @param array utilities
  * @param string breakpoint
  */
@@ -86,6 +90,6 @@ export const hasHeightUtility = (utilities) => {
   return found;
 };
 
-export const capitalizeFirstLetter = (s) => {
-  return s.charAt(0).toUpperCase() + s.slice(1);
+export const capitalizeFirstLetter = (string) => {
+  return string.charAt(0).toUpperCase() + string.slice(1);
 };

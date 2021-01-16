@@ -10,5 +10,5 @@
   }
 </script>
 
-<input type="text" class="bg-white p-2 w-full border border-gray-300" 
+<input type="text" class="bg-white p-1 w-full border border-gray-300" 
 bind:value={setting.value} placeholder={setting.placeholder} on:input={handleChange}  />

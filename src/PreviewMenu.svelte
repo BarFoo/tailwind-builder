@@ -2,10 +2,7 @@
   import { previewBreakpoint, previousBreakpoint } from "./stores";
   import { getContext } from "svelte";
   import CodePopup from "./CodePopup.svelte";
-  import DesktopIcon from "./icons/Desktop.svelte";
-  import TabletIcon from "./icons/Tablet.svelte";
-  import MobileIcon from "./icons/Mobile.svelte";
-  import CodeIcon from "./icons/Code.svelte";
+  import Icon from "./common/Icon.svelte";
 
   const { open } = getContext("modal");
   const previewClick = (breakpoint) => $previewBreakpoint = breakpoint;
@@ -18,29 +15,17 @@
 </script>
 
 <div class="flex gap-3">
-  <span class="code-icon align-middle" title="View Code" on:click={showCodeModal}><CodeIcon /></span>
+  <span class="code-icon align-middle" title="View Code" on:click={showCodeModal}><Icon name="code" width="1.5rem" height="1.5rem" /></span>
   <span class="preview-icon" class:is-preview-active={$previewBreakpoint === "desktop"} title="Desktop Preview"
-    on:click={() => previewClick("desktop")}><DesktopIcon /></span>
-  <span class="preview-icon-tablet" class:is-preview-active={$previewBreakpoint === "tablet"} title="Tablet Preview"
-    on:click={() => previewClick("tablet")}><TabletIcon /></span>
+    on:click={() => previewClick("desktop")}><Icon name="desktop" width="1.5rem" height="1.5rem" /></span>
+  <span class="preview-icon" class:is-preview-active={$previewBreakpoint === "tablet"} title="Tablet Preview"
+    on:click={() => previewClick("tablet")}><Icon name="tablet" width="1.18rem" height="1.5rem" /></span>
   <span class="preview-icon" class:is-preview-active={$previewBreakpoint === "mobile"} title="Mobile Preview"
-    on:click={() => previewClick("mobile")}><MobileIcon /></span>
+    on:click={() => previewClick("mobile")}><Icon name="mobile" width="1.5rem" height="1.5rem" /></span>
 </div>
 
 <style>
-  .preview-icon {
-    width: 1.5rem;
-    height: 1.5rem;
-    cursor: pointer;
-  }
-  .preview-icon-tablet {
-    width: 1.18rem;
-    height: 1.5rem;
-    cursor: pointer;
-  }
-  .code-icon {
-    width: 1.5rem;
-    height: 1.5rem;
+  .preview-icon, .code-icon {
     cursor: pointer;
   }
   /* Use of global to prevent builder stripping out unused styles.. maybe just allow unused styles? */
